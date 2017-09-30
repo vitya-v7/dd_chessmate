@@ -1,0 +1,36 @@
+with(stats);
+ LowBorder[1] := 0;
+ HighBorder[1] := 8;
+ LowBorder[2] := 0;
+ HighBorder[2] := 12;
+ NumPoint := 50000;
+ T := array[1 .. NumPoint, 1 .. 6];
+ f1 := Vector[1 .. NumPoint];
+ f2 := Vector[1 .. NumPoint];
+ f1func := proc (t11, t12, t21, t22, t31, t32) options operator, arrow;
+ min((5/4)*t11+(45/16)*t12, (5/2)*t21+(5/3)*t22, (25/12)*t31+(5/2)*t32) 
+end proc;
+ f2func := proc (t11, t12, t21, t22, t31, t32) options operator, arrow;
+ 160*t11+360*t12+180*t21+120*t22+25.0*t31+30.0*t32 
+end proc;
+ for i to NumPoint do for j to 6 do if `mod`(j, 2) = 0 
+then T[i, j] := stats[random, uniform[LowBorder[1], HighBorder[1]]](1) else T[i, j] := stats[random, uniform[LowBorder[2], HighBorder[2]]](1) 
+end if 
+end do 
+end do;
+ Place := proc (t11, t12, t21, t22, t31, t32, z) if 16*z <= 20*t11+45*t12 and 12*z <= 30*t21+20*t22 and 24*z <= 50*t31+60*t32 and t11+t21+t31 <= 12 and t12+t22+t32 <= 8 and 0 <= t11 and 0 <= t12 and 0 <= t21 and 0 <= t22 and 0 <= t31 and 0 <= t32 
+then 1 else 0 
+end if 
+end proc;
+ Place1 := proc (t11, t12, t21, t22, t31, t32) if t11+t21+t31 <= 12 and t12+t22+t32 <= 8 and 0 <= t11 and 0 <= t12 and 0 <= t21 and 0 <= t22 and 0 <= t31 and 0 <= t32 
+then 1 else 0 
+end if 
+end proc;
+ j := 1;
+ for i to NumPoint do if `and`(Place(T[i, 1], T[i, 2], T[i, 3], T[i, 4], T[i, 5], T[i, 6], min((20*T[i, 1]+45*T[i, 2])*(1/16), (30*T[i, 3]+20*T[i, 4])*(1/12), (50*T[i, 5]+60*T[i, 6])*(1/24))) = 1, Place1(T[i, 1], T[i, 2], T[i, 3], T[i, 4], T[i, 5], T[i, 6]) = 1) 
+then f2[j] := f2func(T[i, 1], T[i, 2], T[i, 3], T[i, 4], T[i, 5], T[i, 6]);
+ f1[j] := f1func(T[i, 1], T[i, 2], T[i, 3], T[i, 4], T[i, 5], T[i, 6]);
+ j := j+1 
+end if 
+end do;
+ j
